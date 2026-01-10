@@ -26,7 +26,7 @@ class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
         super().__init__(tag, value, None, props)
 
-    def to_html(self):
+    def to_html(self): #type: ignore
         if self.value is None:
             raise ValueError("invalid HTML: no value")
         
@@ -46,7 +46,7 @@ class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
         super().__init__(tag, None, children, props)
 
-    def to_html(self):
+    def to_html(self): #type: ignore
         if self.tag is None:
             raise ValueError("invalid HTML: no tag")
         if self.children is None:
