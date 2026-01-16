@@ -42,9 +42,21 @@ def block_to_block_type(block):
         if len(block) > 3 and block[3] == "\n":
             return BlockType.CODE
     
-    # Check for quote block (every line starts with "> ")
-    if lines and all(line.startswith("> ") for line in lines if line.strip()):
-        return BlockType.QUOTE
+    # Check for quote block (every non-empty line starts with ">")
+    # Must have at least one line with "> " (with space) to be a quote
+    if lines:
+        has_quote_marker = False
+        is_quote = True
+        for line in lines:
+            stripped = line.strip()
+            if stripped:
+                if line.startswith("> "):
+                    has_quote_marker = True
+                elif not line.startswith(">"):
+                    is_quote = False
+                    break
+        if is_quote and has_quote_marker:
+            return BlockType.QUOTE
     
     # Check for unordered list (every line starts with "- ")
     if lines and all(line.startswith("- ") for line in lines if line.strip()):
@@ -110,11 +122,14 @@ def code_to_html_node(block):
 def quote_to_html_node(block):
     """Convert a quote block to an HTMLNode."""
     lines = block.split("\n")
-    # Remove "> " prefix from each line and join with newlines
+    # Remove ">" or "> " prefix from each line and join with newlines
     text_lines = []
     for line in lines:
         if line.startswith("> "):
             text_lines.append(line[2:])
+        elif line.startswith(">"):
+            # Line is just ">" or ">" followed by whitespace - treat as empty line
+            text_lines.append("")
         elif line.strip():
             text_lines.append(line)
     

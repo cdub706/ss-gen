@@ -1,12 +1,27 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode
+import os, shutil
+from copystatic import copy_directory
+from gencontent import generate_page
+
+dir_path_static = "./static"
+dir_path_public = "./public"
+dir_path_content = "./content"
+template_path = "./template.html"
 
 def main():
-    node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    print(node)
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
 
-    node1 = HTMLNode("p", "This is a paragrapgh")
-    print(node1)
+    print("Copying static files to public directory...")
+    copy_directory(dir_path_static, dir_path_public)
+    
+    # Generate page from content/index.md
+    print("Generating page...")
+    generate_page(
+        os.path.join(dir_path_content, "index.md"),
+        template_path,
+        os.path.join(dir_path_public, "index.html"),
+    )
 
 if __name__ == "__main__":
     main()
